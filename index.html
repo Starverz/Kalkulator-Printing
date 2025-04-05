@@ -473,7 +473,7 @@
         grad.addColorStop(1, "#9c27b0");
         ctx.fillStyle = grad;
         ctx.fillRect(innerX, innerY, innerW, innerH);
-        // Paparkan label menggunakan saiz akhir (termasuk white border)
+        // Paparkan label menggunakan saiz akhir (termasuk white border) dengan dua digit perpuluhan
         drawSizeLabel(ctx, sx, sy, finalDw, finalDh, finalW, finalH);
         return;
       }
@@ -545,6 +545,7 @@
       drawSizeLabel(ctx, sx, sy, dw, dh, w, h);
     }
 
+    // Fungsi drawSizeLabel() dengan dua digit perpuluhan
     function drawSizeLabel(ctx, sx, sy, dw, dh, w, h) {
       ctx.strokeStyle = "red";
       ctx.fillStyle = "black";
@@ -554,12 +555,12 @@
       ctx.moveTo(sx, sy + dh + 15);
       ctx.lineTo(sx + dw, sy + dh + 15);
       ctx.stroke();
-      ctx.fillText(`${w}ft`, sx + dw / 2 - 10, sy + dh + 35);
+      ctx.fillText(`${w.toFixed(2)}ft`, sx + dw / 2 - 10, sy + dh + 35);
       ctx.beginPath();
       ctx.moveTo(sx - 15, sy);
       ctx.lineTo(sx - 15, sy + dh);
       ctx.stroke();
-      ctx.fillText(`${h}ft`, sx - 45, sy + dh / 2 + 5);
+      ctx.fillText(`${h.toFixed(2)}ft`, sx - 45, sy + dh / 2 + 5);
     }
 
     // ------------------------------
