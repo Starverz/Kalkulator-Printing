@@ -187,6 +187,7 @@
     <button onclick="loadPage('businessCard')">Business Card</button>
     <button onclick="loadPage('invitationCard')">Invitation Card</button>
     <button onclick="loadPage('sublimation')">Sublimation</button>
+    <button onclick="loadPage('acrylic')">Acrylic</button>
     <button onclick="loadPage('idCard')">ID Card</button>
   </div>
   <div class="content" id="contentArea">
@@ -216,6 +217,19 @@
       { name: "X-Stand", price: 30 },
       { name: "Easel Stand", price: 80 },
       { name: "Roll Up Stand", price: 90 }
+    ];
+    const acrylicMaterials = [
+      { name: 'Clear', price: 0.00 },
+      { name: 'White', price: 0.02 }
+    ];
+    const acrylicThicknesses = [
+      { label: '3mm', price: 0.03 },
+      { label: '5mm', price: 0.05 },
+      { label: '10mm', price: 0.10 }
+    ];
+    const acrylicPrintTypes = [
+      { label: 'Engrave', price: 0.05 },
+      { label: 'UV Print', price: 0.08 }
     ];
     const exceptionSizes = [
       [3, 1], [3, 2], [3, 3], [3, 4],
@@ -255,6 +269,8 @@
         content.innerHTML = `<h2>Invitation Card</h2><p>Kalkulator akan datang.</p>`;
       } else if (page === 'sublimation') {
         renderSublimationCalculator(content);
+      } else if (page === 'acrylic') {
+        renderAcrylicCalculator(content);
       } else if (page === 'idCard') {
         renderIDCardCalculator(content);
       } else {
@@ -769,6 +785,68 @@
       ctx.lineTo(startX - 10, startY + drawHeight);
       ctx.stroke();
       ctx.fillText(mmHeight + 'mm', startX - 40, startY + drawHeight / 2 + 5);
+    }
+
+    // ------------------------------
+    // 6) Kalkulator Acrylic
+    // ------------------------------
+    function renderAcrylicCalculator(container) {
+      let materialHTML = `<select id="acrylicMaterial">`;
+      acrylicMaterials.forEach(m => {
+        materialHTML += `<option value="${m.price}">${m.name}</option>`;
+      });
+      materialHTML += `</select>`;
+
+      let thicknessHTML = `<select id="acrylicThickness">`;
+      acrylicThicknesses.forEach(t => {
+        thicknessHTML += `<option value="${t.price}">${t.label}</option>`;
+      });
+      thicknessHTML += `</select>`;
+
+      let printHTML = `<select id="acrylicPrint">`;
+      acrylicPrintTypes.forEach(p => {
+        printHTML += `<option value="${p.price}">${p.label}</option>`;
+      });
+      printHTML += `</select>`;
+
+      container.innerHTML = `
+        <h2>Acrylic</h2>
+        <div class="calculator">
+          <label>Lebar (cm):</label>
+          <input type="number" id="acrylicWidth" min="0" step="0.1" value="10" />
+          <label>Tinggi (cm):</label>
+          <input type="number" id="acrylicHeight" min="0" step="0.1" value="10" />
+          <label>Material:</label>
+          ${materialHTML}
+          <label>Ketebalan:</label>
+          ${thicknessHTML}
+          <label>Jenis Cetakan:</label>
+          ${printHTML}
+          <button class="calculate" onclick="kiraAcrylic()">Kira Harga</button>
+          <div class="result" id="acrylicResult"></div>
+        </div>
+      `;
+    }
+
+    function kiraAcrylic() {
+      const w = parseFloat(document.getElementById('acrylicWidth').value) || 0;
+      const h = parseFloat(document.getElementById('acrylicHeight').value) || 0;
+      const material = parseFloat(document.getElementById('acrylicMaterial').value);
+      const thick = parseFloat(document.getElementById('acrylicThickness').value);
+      const printing = parseFloat(document.getElementById('acrylicPrint').value);
+      const resultDiv = document.getElementById('acrylicResult');
+      if (w <= 0 || h <= 0) {
+        resultDiv.innerHTML = 'Sila masukkan saiz yang sah.';
+        return;
+      }
+      const area = w * h; // cm²
+      const unitCost = material + thick + printing;
+      const total = area * unitCost;
+      resultDiv.innerHTML = `
+        Saiz: ${w}cm x ${h}cm (Luas: ${area.toFixed(2)} cm²)<br>
+        Harga Seunit cm²: RM${unitCost.toFixed(2)}<br>
+        <strong>Jumlah Harga: RM${total.toFixed(2)}</strong>
+      `;
     }
   </script>
 </body>
