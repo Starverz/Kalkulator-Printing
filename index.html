@@ -217,6 +217,17 @@
       { name: "Easel Stand", price: 80 },
       { name: "Roll Up Stand", price: 90 }
     ];
+    const businessCardMaterials = [
+      { name: 'Art Card 260gsm', single: 25, double: 35 },
+      { name: 'Art Card 310gsm', single: 30, double: 40 },
+      { name: 'Linen 230gsm', single: 40, double: 60 }
+    ];
+    const laminateOptions = [
+      { name: 'Tiada', cost: 0 },
+      { name: 'Gloss Laminate', cost: 10 },
+      { name: 'Matte Laminate', cost: 12 }
+    ];
+    const spotUVCost = 20; // cost per 100 pcs
     const exceptionSizes = [
       [3, 1], [3, 2], [3, 3], [3, 4],
       [4, 1], [4, 2], [4, 3], [4, 4]
@@ -250,7 +261,7 @@
       } else if (page === 'stand') {
         renderStandGrid(content);
       } else if (page === 'businessCard') {
-        content.innerHTML = `<h2>Business Card</h2><p>Kalkulator akan datang.</p>`;
+        renderBusinessCardCalculator(content);
       } else if (page === 'invitationCard') {
         content.innerHTML = `<h2>Invitation Card</h2><p>Kalkulator akan datang.</p>`;
       } else if (page === 'sublimation') {
@@ -287,6 +298,71 @@
       }
       html += `</div>`;
       container.innerHTML = html;
+    }
+
+    // ------------------------------
+    // 3) Kalkulator Business Card
+    // ------------------------------
+    function renderBusinessCardCalculator(container) {
+      let materialOptions = `<select id="bcMaterial">`;
+      businessCardMaterials.forEach((m, i) => {
+        materialOptions += `<option value="${i}">${m.name}</option>`;
+      });
+      materialOptions += `</select>`;
+      let laminateHTML = `<select id="bcLaminate">`;
+      laminateOptions.forEach((l, i) => {
+        laminateHTML += `<option value="${i}">${l.name}</option>`;
+      });
+      laminateHTML += `</select>`;
+      container.innerHTML = `
+        <h2>Business Card</h2>
+        <div class="calculator">
+          <label>Material:</label>
+          ${materialOptions}
+          <label>Printing Side:</label>
+          <select id="bcSide">
+            <option value="single">Single Side</option>
+            <option value="double">Double Side</option>
+          </select>
+          <label>Kuantiti (pcs):</label>
+          <input type="number" id="bcQty" value="100" step="100" min="100" />
+          <label>Laminate:</label>
+          ${laminateHTML}
+          <div class="variation-item" style="margin-top:10px;">
+            <input type="checkbox" id="bcSpotUV" />
+            <label for="bcSpotUV">Tambah Spot UV</label>
+          </div>
+          <button class="calculate" onclick="kiraBusinessCard()">Kira Harga</button>
+          <div class="result" id="bcResult"></div>
+        </div>
+      `;
+    }
+
+    function kiraBusinessCard() {
+      const mIdx = parseInt(document.getElementById('bcMaterial').value);
+      const side = document.getElementById('bcSide').value;
+      const qty = parseInt(document.getElementById('bcQty').value) || 0;
+      const lamIdx = parseInt(document.getElementById('bcLaminate').value);
+      const spot = document.getElementById('bcSpotUV').checked;
+      const result = document.getElementById('bcResult');
+      if (qty < 100) {
+        result.innerHTML = 'Kuantiti minima ialah 100 keping.';
+        return;
+      }
+      const units = qty / 100;
+      const base = businessCardMaterials[mIdx][side] * units;
+      const lamCost = laminateOptions[lamIdx].cost * units;
+      const uvCost = spot ? spotUVCost * units : 0;
+      const total = base + lamCost + uvCost;
+      result.innerHTML = `
+        <p>Material: ${businessCardMaterials[mIdx].name}</p>
+        <p>Printing: ${side === 'single' ? 'Single' : 'Double'} Side</p>
+        <p>Kuantiti: ${qty} pcs</p>
+        <p>Laminate: ${laminateOptions[lamIdx].name}</p>
+        <p>Spot UV: ${spot ? 'Ya' : 'Tiada'}</p>
+        <hr/>
+        <strong>Jumlah Harga: RM${total.toFixed(2)}</strong>
+      `;
     }
 
     // ------------------------------
